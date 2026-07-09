@@ -19,7 +19,6 @@ const INITIAL_FORM = {
   products_discussed: [],
   summary: '',
   sentiment: 'neutral',
-  next_action: '',
   followup_date: '',
   followup_action: '',
   followup_priority: 'medium',
@@ -37,6 +36,7 @@ const INITIAL_FIELD_STATUS = {
   sentiment: 'idle',
   followup_date: 'idle',
   followup_action: 'idle',
+  notes: 'idle',
 };
 
 /**
@@ -75,9 +75,9 @@ export const sendChatMessage = createAsyncThunk(
           products_discussed: aiState.formData?.products_discussed || [],
           summary: aiState.formData?.summary || null,
           sentiment: aiState.formData?.sentiment || null,
-          next_action: aiState.formData?.next_action || null,
           followup_date: aiState.formData?.followup_date || null,
           followup_action: aiState.formData?.followup_action || null,
+          notes: aiState.formData?.notes || null,
         },
         recent_chat_messages: recentMessages,
         ...context,
@@ -244,6 +244,7 @@ const aiSlice = createSlice({
         sentiment: 'sentiment',
         followup_date: 'followup_date',
         followup_action: 'followup_action',
+        notes: 'notes',
       };
 
       const formKey = fieldMap[field];

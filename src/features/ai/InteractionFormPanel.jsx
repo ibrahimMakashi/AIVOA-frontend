@@ -27,8 +27,7 @@ import { today } from '../../utils/dateHelpers';
 // Fields that support character-by-character typing animation
 const ANIMATED_TEXT_FIELDS = [
   'doctor_name', 'hospital', 'specialty',
-  'summary', 'next_action', 'followup_action',
-  'objections', 'notes',
+  'summary', 'followup_action', 'notes',
 ];
 
 // Characters per second for the typing effect (~50 cps feels natural)
@@ -237,7 +236,6 @@ const InteractionFormPanel = () => {
       products_discussed: formData.products_discussed?.length ? formData.products_discussed : undefined,
       summary: formData.summary || undefined,
       sentiment: formData.sentiment || 'neutral',
-      next_action: formData.next_action || undefined,
       notes: formData.notes
         ? [{ content: formData.notes, note_type: 'general' }]
         : undefined,
@@ -540,31 +538,6 @@ const InteractionFormPanel = () => {
             </Box>
           </Box>
 
-          <Box sx={{ mt: 1.5 }} ref={(el) => { fieldRefs.current.objections = el; }}>
-            <TextField
-              label="Objections / Concerns"
-              value={localDisplay.objections}
-              onChange={(e) => updateField('objections', e.target.value)}
-              fullWidth
-              multiline
-              minRows={2}
-              size="small"
-              placeholder="Any objections or concerns raised by the doctor"
-            />
-          </Box>
-
-          <Box sx={{ mt: 1.5 }} ref={(el) => { fieldRefs.current.next_action = el; }}>
-            <TextField
-              label="Next Steps"
-              value={localDisplay.next_action}
-              onChange={(e) => updateField('next_action', e.target.value)}
-              fullWidth
-              multiline
-              minRows={2}
-              size="small"
-              placeholder="What are the agreed next steps?"
-            />
-          </Box>
         </SectionCard>
 
         <SectionCard>
@@ -606,16 +579,18 @@ const InteractionFormPanel = () => {
           <SectionTitle>Additional Notes</SectionTitle>
 
           <Box ref={(el) => { fieldRefs.current.notes = el; }}>
-            <TextField
-              label="Notes"
-              value={localDisplay.notes}
-              onChange={(e) => updateField('notes', e.target.value)}
-              fullWidth
-              multiline
-              minRows={2}
-              size="small"
-              placeholder="Any additional notes..."
-            />
+            <StreamingField status={fieldStatus.notes} aiGenerated={aiGeneratedFields.notes} label="Additional Notes">
+              <TextField
+                label="Notes"
+                value={localDisplay.notes}
+                onChange={(e) => updateField('notes', e.target.value)}
+                fullWidth
+                multiline
+                minRows={2}
+                size="small"
+                placeholder="Any additional notes..."
+              />
+            </StreamingField>
           </Box>
         </SectionCard>
 
