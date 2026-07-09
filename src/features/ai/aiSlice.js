@@ -134,7 +134,7 @@ const aiSlice = createSlice({
      */
     sseEventReceived: (state, action) => {
       const {
-        field, value, confidence, interaction_id, message, chat_only,
+        field, value, confidence, interaction_id, message, chat_only, model,
       } = action.payload;
 
       if (field === '__done__') {
@@ -146,11 +146,14 @@ const aiSlice = createSlice({
         const last = state.messages[state.messages.length - 1];
         if (last?.role === 'assistant' && last.isStreaming) {
           last.isStreaming = false;
+          if (model) last.model = model;
           if (message && !last.content) {
             last.content = message;
           }
         } else if (message) {
-          state.messages.push({ id: Date.now(), role: 'assistant', content: message });
+          state.messages.push({
+            id: Date.now(), role: 'assistant', content: message, model: model || 'AI Agent',
+          });
         }
         return;
       }
@@ -165,6 +168,7 @@ const aiSlice = createSlice({
           role: 'assistant',
           content: `⚠️ ${message || 'Something went wrong. Please try again.'}`,
           isError: true,
+          model: model || 'AI Agent',
         });
         return;
       }
@@ -176,6 +180,7 @@ const aiSlice = createSlice({
           role: 'assistant',
           content: '',
           isStreaming: true,
+          model: model || 'AI Assistant',
         });
         return;
       }
@@ -184,6 +189,7 @@ const aiSlice = createSlice({
         state.isThinking = false;
         const last = state.messages[state.messages.length - 1];
         if (last?.role === 'assistant' && last.isStreaming) {
+          if (model) last.model = model;
           last.content += message || '';
         } else {
           state.messages.push({
@@ -191,6 +197,7 @@ const aiSlice = createSlice({
             role: 'assistant',
             content: message || '',
             isStreaming: true,
+            model: model || 'AI Assistant',
           });
         }
         return;
@@ -199,7 +206,9 @@ const aiSlice = createSlice({
       if (field === '__message__') {
         state.isThinking = false;
         if (message) {
-          state.messages.push({ id: Date.now(), role: 'assistant', content: message });
+          state.messages.push({
+            id: Date.now(), role: 'assistant', content: message, model: model || 'AI Assistant',
+          });
         }
         return;
       }

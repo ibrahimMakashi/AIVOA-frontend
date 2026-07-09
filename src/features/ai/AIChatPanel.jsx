@@ -44,6 +44,7 @@ const SUGGESTION_PROMPTS = [
 
 const ChatMessage = ({ message }) => {
   const isUser = message.role === 'user';
+  const modelLabel = !isUser && message.model ? message.model : null;
   return (
     <Box
       sx={{
@@ -92,37 +93,53 @@ const ChatMessage = ({ message }) => {
             {message.content}
           </Typography>
         ) : (
-          <Box
-            sx={{
-              '& p': { m: 0, fontSize: '0.875rem', lineHeight: 1.6 },
-              '& p + p': { mt: 0.75 },
-              '& code': { bgcolor: (t) => alpha(t.palette.primary.main, 0.08), px: 0.5, py: 0.125, borderRadius: 1, fontFamily: 'monospace', fontSize: '0.85em' },
-              '& ul, & ol': { pl: 2, m: 0 },
-              '& li': { fontSize: '0.875rem', lineHeight: 1.6 },
-              '& h3': { m: 0, fontSize: '0.95rem', fontWeight: 700 },
-              '& h4': { m: '0.5rem 0 0', fontSize: '0.875rem', fontWeight: 600 },
-            }}
-          >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {message.content}
-            </ReactMarkdown>
-            {message.isStreaming && (
-              <Box
-                component="span"
+          <Box>
+            <Box
+              sx={{
+                '& p': { m: 0, fontSize: '0.875rem', lineHeight: 1.6 },
+                '& p + p': { mt: 0.75 },
+                '& code': { bgcolor: (t) => alpha(t.palette.primary.main, 0.08), px: 0.5, py: 0.125, borderRadius: 1, fontFamily: 'monospace', fontSize: '0.85em' },
+                '& ul, & ol': { pl: 2, m: 0 },
+                '& li': { fontSize: '0.875rem', lineHeight: 1.6 },
+                '& h3': { m: 0, fontSize: '0.95rem', fontWeight: 700 },
+                '& h4': { m: '0.5rem 0 0', fontSize: '0.875rem', fontWeight: 600 },
+              }}
+            >
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {message.content}
+              </ReactMarkdown>
+              {message.isStreaming && (
+                <Box
+                  component="span"
+                  sx={{
+                    display: 'inline-block',
+                    width: 2,
+                    height: '1em',
+                    ml: 0.25,
+                    verticalAlign: 'text-bottom',
+                    bgcolor: 'secondary.main',
+                    animation: 'blink 0.9s step-end infinite',
+                    '@keyframes blink': {
+                      '0%, 100%': { opacity: 1 },
+                      '50%': { opacity: 0 },
+                    },
+                  }}
+                />
+              )}
+            </Box>
+            {modelLabel && (
+              <Typography
+                variant="caption"
                 sx={{
-                  display: 'inline-block',
-                  width: 2,
-                  height: '1em',
-                  ml: 0.25,
-                  verticalAlign: 'text-bottom',
-                  bgcolor: 'secondary.main',
-                  animation: 'blink 0.9s step-end infinite',
-                  '@keyframes blink': {
-                    '0%, 100%': { opacity: 1 },
-                    '50%': { opacity: 0 },
-                  },
+                  display: 'block',
+                  mt: 0.9,
+                  fontSize: '0.68rem',
+                  color: 'text.secondary',
+                  opacity: 0.9,
                 }}
-              />
+              >
+                {modelLabel}
+              </Typography>
             )}
           </Box>
         )}
