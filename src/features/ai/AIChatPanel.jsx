@@ -454,9 +454,9 @@ const AIChatPanel = () => {
           sx={{
             display: 'flex',
             gap: 1,
-            alignItems: 'flex-end',
+            alignItems: 'stretch',
             p: 0.75,
-            borderRadius: 99,
+            borderRadius: 2.5,
             border: '1px solid',
             borderColor: (t) => alpha(t.palette.divider, 0.85),
             bgcolor: (t) => alpha(t.palette.common.white, 0.9),
@@ -476,12 +476,16 @@ const AIChatPanel = () => {
             variant="outlined"
             size="small"
             sx={{
+              alignSelf: 'stretch',
               '& .MuiOutlinedInput-root': {
-                borderRadius: 99,
+                alignItems: 'flex-start',
+                minHeight: 52,
+                borderRadius: 2,
                 fontSize: '0.875rem',
                 lineHeight: 1.5,
                 bgcolor: 'transparent',
-                px: 0.5,
+                px: 0.75,
+                py: 0.35,
                 '& fieldset': {
                   borderColor: 'transparent',
                 },
@@ -493,12 +497,13 @@ const AIChatPanel = () => {
                 },
               },
               '& .MuiInputBase-input': {
-                py: 0.65,
+                overflow: 'auto !important',
+                py: 0,
               },
             }}
           />
           <Tooltip title="Send (Enter)">
-            <Box sx={{ flexShrink: 0 }}>
+            <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'flex-end' }}>
               <IconButton
                 onClick={handleSend}
                 disabled={!input.trim() || isThinking || isStreaming}
@@ -508,6 +513,7 @@ const AIChatPanel = () => {
                   width: 44,
                   height: 44,
                   flexShrink: 0,
+                  alignSelf: 'flex-end',
                   boxShadow: '0 10px 18px rgba(21, 101, 192, 0.28)',
                   transition: 'transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease',
                   '&:hover': {
