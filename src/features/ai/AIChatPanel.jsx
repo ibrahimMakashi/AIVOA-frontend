@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Box, TextField, IconButton, Typography, Avatar, Paper,
-  CircularProgress, Tooltip, alpha,
+  CircularProgress, Tooltip, alpha, Button, Menu, MenuItem, ListItemText,
 } from '@mui/material';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { sendChatMessage } from './aiSlice';
@@ -40,6 +41,29 @@ const SUGGESTION_PROMPTS = [
   'I met Dr Sharma yesterday at Apollo Hospital. We discussed Diabetrol. He requested clinical data. Follow up next Monday.',
   'Visited Dr Priya Mehta at Fortis, Mumbai today. She was positive about CardioMax. Schedule follow-up in 2 weeks.',
   'Called Dr Ramesh Gupta this morning. Discussed upcoming conference. He is interested in Diabetrol samples.',
+];
+
+const TOOL_TEST_PROMPTS = [
+  {
+    label: '1. Log Interaction',
+    prompt: 'I met Dr Ibrahim Mehta yesterday at Apollo Hospital. We discussed Diabetrol and CardioSafe. He was positive about Diabetrol but asked for Phase III clinical data. Please follow up next Tuesday by sending the clinical data. Mark it as high priority and add a note that he prefers email follow-up.',
+  },
+  {
+    label: '2. Search HCP',
+    prompt: 'Show me the profile of Dr Ibrahim Mehta.',
+  },
+  {
+    label: '3. Edit Interaction',
+    prompt: 'Change the sentiment to neutral, update the summary to say he wants more efficacy evidence before prescribing, move the follow-up to next Friday, and add a note that he prefers email follow-up.',
+  },
+  {
+    label: '4. Follow-up Suggestions',
+    prompt: 'What should I do next with Dr Ibrahim Mehta? Give me follow-up suggestions.',
+  },
+  {
+    label: '5. Relationship Summary',
+    prompt: 'Summarize my relationship with Dr Ibrahim Mehta.',
+  },
 ];
 
 const ChatMessage = ({ message }) => {
@@ -155,6 +179,7 @@ const AIChatPanel = () => {
   const isStreaming = useSelector(selectIsStreaming);
   const sessionId = useSelector(selectSessionId);
   const [input, setInput] = useState('');
+  const [testMenuAnchor, setTestMenuAnchor] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const isChatStreaming = messages.some((m) => m.isStreaming);
@@ -185,6 +210,20 @@ const AIChatPanel = () => {
   const handleSuggestion = (text) => {
     setInput(text);
     inputRef.current?.focus();
+  };
+
+  const handleOpenTestMenu = (event) => {
+    setTestMenuAnchor(event.currentTarget);
+  };
+
+  const handleCloseTestMenu = () => {
+    setTestMenuAnchor(null);
+  };
+
+  const handleTestPromptSelect = (text) => {
+    setInput(text);
+    handleCloseTestMenu();
+    setTimeout(() => inputRef.current?.focus(), 50);
   };
 
   return (
@@ -225,9 +264,78 @@ const AIChatPanel = () => {
           <AutoAwesomeRoundedIcon sx={{ color: 'white', fontSize: '1rem' }} />
         </Box>
         <Box>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-            AI Assistant
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+              AI Assistant
+            </Typography>
+            <Button
+              size="small"
+              variant="text"
+              onClick={handleOpenTestMenu}
+              endIcon={<KeyboardArrowDownRoundedIcon sx={{ fontSize: '1rem' }} />}
+              sx={{
+                minWidth: 0,
+                px: 1,
+                py: 0.2,
+                borderRadius: 99,
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                color: 'secondary.main',
+                bgcolor: (t) => alpha(t.palette.secondary.main, 0.08),
+                textTransform: 'none',
+                '&:hover': {
+                  bgcolor: (t) => alpha(t.palette.secondary.main, 0.14),
+                },
+              }}
+            >
+              Test Tools
+            </Button>
+            <Menu
+              anchorEl={testMenuAnchor}
+              open={Boolean(testMenuAnchor)}
+              onClose={handleCloseTestMenu}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              PaperProps={{
+                sx: {
+                  mt: 0.5,
+                  width: 360,
+                  maxWidth: 'calc(100vw - 32px)',
+                  borderRadius: 2,
+                  boxShadow: '0 12px 32px rgba(15, 23, 42, 0.12)',
+                },
+              }}
+            >
+              {TOOL_TEST_PROMPTS.map((item) => (
+                <MenuItem
+                  key={item.label}
+                  onClick={() => handleTestPromptSelect(item.prompt)}
+                  sx={{
+                    py: 1.1,
+                    alignItems: 'flex-start',
+                    whiteSpace: 'normal',
+                  }}
+                >
+                  <ListItemText
+                    primary={item.label}
+                    secondary={item.prompt}
+                    primaryTypographyProps={{
+                      fontSize: '0.82rem',
+                      fontWeight: 700,
+                    }}
+                    secondaryTypographyProps={{
+                      fontSize: '0.74rem',
+                      sx: {
+                        mt: 0.25,
+                        lineHeight: 1.45,
+                        color: 'text.secondary',
+                      },
+                    }}
+                  />
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
           <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
             {isChatStreaming
               ? '● Writing...'
